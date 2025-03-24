@@ -45,7 +45,7 @@ contract with the base type `<typeparamref name="T"/>` is not symmetric.
 This is a three-state version of `NotNullable<T>`. The additional third state is the 
 default, uninitialized state of a struct (recall that a struct has a state before 
 any declared constructors are run) and is marked by `IsResolved` being false.
-`IsResolved` is only true of a default instance. Once the constructor instance 
+`IsResolved` is _only_ false for a default instance. Once the constructor instance 
 is constructed with a value, (whether an actual value or null), `IsResolved`
 will be true, and the value of `HasValue` and `NoValue` will indicate whether the contained
 value is null or not.
