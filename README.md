@@ -42,13 +42,20 @@ contract with the base type `<typeparamref name="T"/>` is not symmetric.
 
 ## `EventualNotNullable<T>`
 
-This is a three-state version of `NotNullable<T>`. The additional third state is marked
-by `IsResolved` being false, and is only true of a default, uninitialized instance. Once an
-instance is constructed with a value, (whether or not the value is null), `IsResolved`
-will be true, and the value of HasValue and NoValue will indicate whether the contained
+This is a three-state version of `NotNullable<T>`. The additional third state is the 
+default, uninitialized state of a struct (recall that a struct has a state before 
+any declared constructors are run) and is marked by `IsResolved` being false.
+`IsResolved` is only true of a default instance. Once the constructor instance 
+is constructed with a value, (whether an actual value or null), `IsResolved`
+will be true, and the value of `HasValue` and `NoValue` will indicate whether the contained
 value is null or not.
 
 ```
 default( NotNullable<T> ) == new NotNullable<T>( null ) // true
 default( EventualNotNullable<T> ) == new EventualNotNullable<T>( null ) // false
 ```
+
+#### Why not `Maybe<T>`?
+
+Because people using `Maybe<T>` probably expect it to <a href="https://en.wikipedia.org/wiki/Monad_(functional_programming)#An_example:_Maybe">
+conform to monad rules</a>, which these don't.
