@@ -36,10 +36,11 @@ using System.Diagnostics.CodeAnalysis;
 /// <seealso cref="Equals(EventualNotNullable{T})"/>
 /// </remarks>
 /// <typeparam name="T"></typeparam>
-public struct EventualNotNullable<T> : IEquatable<EventualNotNullable<T>> where T : class
+public readonly struct EventualNotNullable<T> : IEquatable<EventualNotNullable<T>> where T : class
 {
     /// <summary>
-    /// The default value of a <c>new EventualNotNullable<T>()</c>, which has <see cref="IsResolved"/> set to false.
+    /// The default value of a <c>new EventualNotNullable<T>()</c>, which has <see cref="IsResolved"/> 
+    // set to false.
     /// </summary>
     public static readonly EventualNotNullable<T> Default = new();
 
@@ -47,7 +48,7 @@ public struct EventualNotNullable<T> : IEquatable<EventualNotNullable<T>> where 
     
     public readonly bool IsResolved;
 
-    internal T? value;
+    internal readonly T? value;
 
     /// <summary>
     /// If <paramref name="value"/> is null, then creates an instance for which

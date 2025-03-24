@@ -32,7 +32,7 @@ using System.Diagnostics.CodeAnalysis;
 /// <seealso cref="Equals(MyStudents.BL.Extensions.NotNullable{T})"/>
 /// </remarks>
 /// <typeparam name="T"></typeparam>
-public struct NotNullable<T> : IEquatable<NotNullable<T>> where T : class
+public readonly struct NotNullable<T> : IEquatable<NotNullable<T>> where T : class
 {
     /// <summary>
     /// The default value of a <c>new NotNullable<T>()</c> with no value passed to the constructor.
@@ -41,7 +41,7 @@ public struct NotNullable<T> : IEquatable<NotNullable<T>> where T : class
 
     readonly bool hasValue;
 
-    internal T? value;
+    internal readonly T? value;
 
     /// <summary>
     /// If <paramref name="value"/> is null, then creates an instance for which
