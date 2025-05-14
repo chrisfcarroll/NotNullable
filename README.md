@@ -8,15 +8,17 @@
 Similar to `Nullable<T> where T : struct` provided by C# for structs, but:
   
 1. They are for reference types,
-2. They are slightly stricter. There is no implicit cast back to `<typeparam name="T"/>`,
-   you have to read `wrapper.Value` to get the value. An InvalidOperationException
-   is thrown if you read the Value of null.
+2. They are slightly stricter in that there is no implicit cast back to `<typeparam name="T"/>`.
+   You must read `wrapper.Value` to get the value, after first checking `HasValue`.
+   An InvalidOperationException is thrown if you read the Value of an instance of which
+   `HasValue` is false.
 
-Intended to be used as a return type for methods that cannot guarantee returning a
-not-null value, but which instead want to insist that consuming  code must check for null
+Can be used a return type of methods that cannot guarantee returning a
+not-null value, and which instead want to insist that consuming code must check for null
 before using the returned value.
 By returning a `NotNullable<T>` instead of a possibly-null instance of <c>T</c>
-you force the consuming code to do a null check before accessing the value.
+you more explicitly require the consuming code to do a null check before accessing 
+the value.
   
 <p>Why? Intended as a more C# idomatic alternative to other fp-style Monads 
 for code that wants to enforces null checking.</p>
