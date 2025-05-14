@@ -1,4 +1,4 @@
-# NotNullable. An almost transparent way to enforce null-checking in C# might-be-null reference types
+# NotNullable. An almost transparent way to enforce null-checking in C# maybe-null reference types
 
 - `NotNullable<T> where T : class` 
 - `EventualNotNullable<T> where T : class`
@@ -18,14 +18,14 @@ before using the returned value.
 By returning a `NotNullable<T>` instead of a possibly-null instance of <c>T</c>
 you force the consuming code to do a null check before accessing the value.
   
-<p>Why? As a hopefully simpler and more C#-obvious alternative to using fp-style Monads 
+<p>Why? Intended as a more C# idomatic alternative to other fp-style Monads 
 for code that wants to enforces null checking.</p>
 
 ### Consumption: use either of these idioms
 ```
 var maybe = datasource.Get(key);
 if(maybe.HasValue){ ... use maybe.Value ... }else{ ... handle not found case ...}
-if(maybe.NoValue){ ... handle not found case ... }else{... use maybe.Value ...}
+if(maybe.HasNoValue){ ... handle not found case ... }else{... use maybe.Value ...}
 ```
 
 ### Production: use one of these idioms
@@ -58,4 +58,4 @@ default( EventualNotNullable<T> ) == new EventualNotNullable<T>( null ) // false
 #### Why not `Maybe<T>`?
 
 Because people using `Maybe<T>` probably expect it to <a href="https://en.wikipedia.org/wiki/Monad_(functional_programming)#An_example:_Maybe">
-conform to monad rules</a>, which these don't.
+conform to monad rules</a>, such as the language defining a monadic bind operator.
