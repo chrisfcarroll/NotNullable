@@ -2,32 +2,35 @@ using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// <p>Similar to the <see cref="Nullable{T}"/> for structs, but (1) for reference types,
-/// and (2) slightly stricter (there is no implicit cast back to <typeparam name="T"></typeparam>)
+/// and (2) slightly stricter because there is no implicit cast back to <typeparamref name="T"/>.
 /// </p>
 /// <p>Intended to be used as a return type for methods that cannot guarantee returning a
-/// not-null value, and which wants to insist that consuming  code must check for null
+/// not-null value, and which want to insist that consuming  code must check for null
 /// before using the returned value.
-/// By returning a <see cref="NotNullable{T}"/> instead of a possibly-null instance of <c>T</c>
-/// you force the consuming code to do a null check before accessing the value 
-/// </p>
-/// <p>Why? As an alternative to using fp-style Monads for code that wants to
-/// enforces null checking.</p>
-/// Consumption: use either of these idioms
+/// By returning a <see cref="NotNullable{T}"/> instead of a possibly-null instance of
+/// <typeparamref name="T"/> you force the consuming code to do a null check before accessing
+/// the value.</p>
+/// <p>Why? As a more familiar idiom than other fp-style Monads for code that wants to
+/// enforce null checking.</p>
+/// <p><b>Consumption:</b></p>
+/// Use either of these idioms
 /// <code>
-/// var tutee = GetProfileData.Get(personNumber)
-/// if(tutee.HasValue){ ... use tutee.Value ... }else{ ... handle not found case ...}
-/// if(tutee.NoValue){ ... handle not found case ... }else{... use tutee.Value}
+/// var user = GetUserData(userId)
+/// if(user.HasValue){ ... can reference user.Value here ... }else{ ... handle the not found case ...}
+/// // or
+/// if(user.HasNoValue){ ... handle the not found case ... }else{... use user.Value}
 /// </code>
-/// Production: use one of these idioms
+/// <p><b>Production:</b></p>
+/// Use any of these idioms
 /// <code>
 /// public NotNullable&lt;T> SomeMethod&lt;T>() => doIHaveSomethingToReturn ? value : NotNullable&lt;T>.Default; 
-/// public NotNullable&lt;T> OtherMethod&lt;T>() => new NotNullable&lt;T>( maybeNullValue); 
-/// public NotNullable&lt;T> OtherMethod&lt;T>() => NotNullable.Create( maybeNullValue); 
+/// public NotNullable&lt;T> OtherMethod&lt;T>() => new NotNullable&lt;T>( maybeNullValue );
+/// public NotNullable&lt;T> OtherMethod&lt;T>() => NotNullable.Create( maybeNullValue );
 /// </code>
 /// </summary>
 /// <remarks>
 /// Note that because you are not allowed to access the wrapped value without
-/// first checking <see cref="HasValue"/> (or <see cref="NoValue"/>), the equality
+/// first checking <see cref="HasValue"/> (or <see cref="HasNoValue"/>), the equality
 /// contract with the base type <typeparamref name="T"/> is not symmetric.
 /// <seealso cref="Equals(MyStudents.BL.Extensions.NotNullable{T})"/>
 /// </remarks>
@@ -41,27 +44,27 @@ public readonly struct NotNullable<T> : IEquatable<NotNullable<T>> where T : cla
 
     readonly bool hasValue;
 
-    internal readonly T? value;
+    readonly T? value;
 
     /// <summary>
     /// If <paramref name="value"/> is null, then creates an instance for which
-    /// <see cref="HasValue"/> is false and <see cref="NoValue"/> is true.
+    /// <see cref="HasValue"/> is false and <see cref="HasNoValue"/> is true.
     /// If <paramref name="value"/> is not null, then creates an instance for which
-    /// <see cref="HasValue"/> is true, <see cref="NoValue"/> is false, and
+    /// <see cref="HasValue"/> is true, <see cref="HasNoValue"/> is false, and
     /// <see cref="Value"/> is <paramref name="value"/>
     /// </summary>
     /// <param name="value"></param>
     public NotNullable(T? value)
     {
         hasValue = value is not null;
-        this.value = value!;
+        this.value = value;
     }
 
     [MemberNotNullWhen(true, nameof(value), nameof(Value))]
     public readonly bool HasValue => hasValue;
     
     [MemberNotNullWhen(false, nameof(value), nameof(Value))]
-    public readonly bool NoValue => !hasValue;
+    public readonly bool HasNoValue => !hasValue;
 
     /// <summary>
     /// The Value being wrapped.
@@ -69,19 +72,21 @@ public readonly struct NotNullable<T> : IEquatable<NotNullable<T>> where T : cla
     /// <exception cref="InvalidOperationException">
     /// <b>Note:</b> Reading the Value property of an instance wrapping null will throw an Exception.
     /// </exception>
-    public readonly T Value => value ?? throw new InvalidOperationException("The nullable value has not been set.");
+    public readonly T Value => value ?? throw new InvalidOperationException("A NotNullable value was accessed when it has a null value.");
     
     /// <returns><c>null</c> if <see cref="Value"/> is <c>null</c>,
     /// otherwise returns <c>Value.ToString()</c>.
     /// </returns>
-    public override string? ToString() => hasValue ? value!.ToString() : null;
+    #pragma warning disable CS8602 // There is no dereference of a possibly null reference.
+    public override string? ToString() => hasValue ? value.ToString() : null;
+    #pragma warning restore CS8602
 
     /// <returns><c>new (value)</c></returns>
     public static implicit operator NotNullable<T>(T? value) => new (value);
     
     /// <remarks>
     /// Note that because you are not allowed to access the wrapped value without
-    /// first checking <see cref="HasValue"/> (or <see cref="NoValue"/>), the equality
+    /// first checking <see cref="HasValue"/> (or <see cref="HasNoValue"/>), the equality
     /// contract with the base type <typeparamref name="T"/> is not symmetric.:
     /// <code>
     /// T value = new T(...);
@@ -108,7 +113,7 @@ public readonly struct NotNullable<T> : IEquatable<NotNullable<T>> where T : cla
     /// <param name="obj"></param>
     /// <remarks>
     /// Note that because you are not allowed to access the wrapped value without
-    /// first checking <see cref="HasValue"/> (or <see cref="NoValue"/>), the equality
+    /// first checking <see cref="HasValue"/> (or <see cref="HasNoValue"/>), the equality
     /// contract with the base type <typeparamref name="T"/> is not symmetric.:
     /// <code>
     /// T value = new T(...);
